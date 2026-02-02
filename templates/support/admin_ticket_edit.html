@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Ticket #{{ ticket.id }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">Manage Ticket #{{ ticket.id }}</h2>
+    <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Dashboard
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <!-- Ticket Info -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Ticket Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Title:</strong> {{ ticket.title }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Category:</strong> {{ ticket.get_category_display }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Employee:</strong> {{ ticket.employee.get_full_name|default:ticket.employee.username }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Created:</strong> {{ ticket.created_at|date:"F d, Y H:i" }}
+                    </div>
+                </div>
+                <hr>
+                <h6 class="mb-3"><i class="bi bi-person-lines-fill"></i> Customer Contact Information</h6>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Name:</strong> {{ ticket.customer_name|default:"Not provided" }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Email:</strong>
+                        {% if ticket.customer_email %}
+                            <a href="mailto:{{ ticket.customer_email }}">{{ ticket.customer_email }}</a>
+                        {% else %}
+                            Not provided
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Phone:</strong>
+                        {% if ticket.customer_phone %}
+                            <a href="tel:{{ ticket.customer_phone }}">{{ ticket.customer_phone }}</a>
+                        {% else %}
+                            Not provided
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Alternate Phone:</strong>
+                        {% if ticket.customer_alternate_phone %}
+                            <a href="tel:{{ ticket.customer_alternate_phone }}">{{ ticket.customer_alternate_phone }}</a>
+                        {% else %}
+                            Not provided
+                        {% endif %}
+                    </div>
+                </div>
+                <hr>
+                <h6>Description</h6>
+                <p class="text-muted">{{ ticket.description|linebreaks }}</p>
+                {% if ticket.screenshot %}
+                    <div class="mt-3">
+                        <strong>Attachment:</strong><br>
+                        <a href="{{ ticket.screenshot.url }}" target="_blank" class="btn btn-sm btn-outline-primary mt-2">
+                            <i class="bi bi-paperclip"></i> View Attachment
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Update Form -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Update Ticket</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Status</label>
+                            {{ form.status }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Urgency</label>
+                            {{ form.urgency }}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Assign to IT Staff</label>
+                        {{ form.assigned_to }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Resolution Notes</label>
+                        {{ form.resolution_notes }}
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Save Changes
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Comments Section -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="bi bi-chat-dots"></i> Comments & Activity</h5>
+            </div>
+            <div class="card-body">
+                {% for comment in comments %}
+                    <div class="comment-item">
+                        <div class="d-flex justify-content-between mb-2">
+                            <strong>{{ comment.user.get_full_name|default:comment.user.username }}</strong>
+                            <small class="comment-meta">{{ comment.created_at|date:"M d, Y H:i" }}</small>
+                        </div>
+                        <p class="mb-0">{{ comment.comment|linebreaks }}</p>
+                    </div>
+                {% empty %}
+                    <p class="text-muted text-center py-3">No comments yet.</p>
+                {% endfor %}
+
+                <hr>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="add_comment" value="1">
+                    <div class="mb-3">
+                        {{ comment_form.comment }}
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-send"></i> Add Comment
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <!-- Customer Contact Card -->
+        {% if ticket.customer_name or ticket.customer_email or ticket.customer_phone %}
+        <div class="card shadow-sm mb-3 border-primary">
+            <div class="card-header bg-white">
+                <h6 class="mb-0"><i class="bi bi-person-lines-fill text-primary"></i> Customer Contact</h6>
+            </div>
+            <div class="card-body">
+                {% if ticket.customer_name %}
+                    <p class="mb-2"><strong>{{ ticket.customer_name }}</strong></p>
+                {% endif %}
+                {% if ticket.customer_email %}
+                    <p class="mb-2">
+                        <i class="bi bi-envelope"></i>
+                        <a href="mailto:{{ ticket.customer_email }}">{{ ticket.customer_email }}</a>
+                    </p>
+                {% endif %}
+                {% if ticket.customer_phone %}
+                    <p class="mb-2">
+                        <i class="bi bi-telephone"></i>
+                        <a href="tel:{{ ticket.customer_phone }}">{{ ticket.customer_phone }}</a>
+                    </p>
+                {% endif %}
+                {% if ticket.customer_alternate_phone %}
+                    <p class="mb-0">
+                        <i class="bi bi-telephone-fill"></i>
+                        <a href="tel:{{ ticket.customer_alternate_phone }}">{{ ticket.customer_alternate_phone }}</a>
+                        <small class="text-muted">(Alternate)</small>
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Quick Stats -->
+        <div class="card shadow-sm mb-3">
+            <div class="card-header bg-white">
+                <h6 class="mb-0">Current Status</h6>
+            </div>
+            <div class="card-body">
+                <p class="mb-2"><strong>Status:</strong><br>
+                    {% if ticket.status == "open" %}
+                        <span class="badge bg-danger">Open</span>
+                    {% elif ticket.status == "in_progress" %}
+                        <span class="badge bg-warning text-dark">In Progress</span>
+                    {% elif ticket.status == "resolved" %}
+                        <span class="badge bg-success">Resolved</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Closed</span>
+                    {% endif %}
+                </p>
+                <p class="mb-2"><strong>Urgency:</strong><br>
+                    <span class="urgency-{{ ticket.urgency }}">
+                        {{ ticket.get_urgency_display }}
+                    </span>
+                </p>
+                <p class="mb-0"><strong>Assigned To:</strong><br>
+                    {% if ticket.assigned_to %}
+                        {{ ticket.assigned_to.get_full_name|default:ticket.assigned_to.username }}
+                    {% else %}
+                        <span class="text-muted">Unassigned</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

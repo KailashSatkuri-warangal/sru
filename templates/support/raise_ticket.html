@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}Raise Ticket{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0"><i class="bi bi-plus-circle"></i> Raise New Ticket</h2>
+    <a href="{% url 'employee_dashboard' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <!-- Customer Contact Information -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="bi bi-person-lines-fill"></i> Customer Contact Information</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data" id="ticketForm">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label fw-bold">Customer Name <span class="text-danger">*</span></label>
+                            {{ form.customer_name }}
+                            {% if form.customer_name.errors %}
+                                <div class="text-danger small">{{ form.customer_name.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Phone Number <span class="text-danger">*</span></label>
+                            {{ form.customer_phone }}
+                            {% if form.customer_phone.errors %}
+                                <div class="text-danger small">{{ form.customer_phone.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Email Address <span class="text-danger">*</span></label>
+                            {{ form.customer_email }}
+                            {% if form.customer_email.errors %}
+                                <div class="text-danger small">{{ form.customer_email.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label fw-bold">Alternate Phone (Optional)</label>
+                            {{ form.customer_alternate_phone }}
+                            {% if form.customer_alternate_phone.errors %}
+                                <div class="text-danger small">{{ form.customer_alternate_phone.errors }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">Optional backup contact number.</small>
+                        </div>
+                    </div>
+            </div>
+        </div>
+
+        <!-- Ticket Details -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="bi bi-ticket-perforated"></i> Ticket Details</h5>
+            </div>
+            <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Title <span class="text-danger">*</span></label>
+                        {{ form.title }}
+                        {% if form.title.errors %}
+                            <div class="text-danger small">{{ form.title.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Category <span class="text-danger">*</span></label>
+                            {{ form.category }}
+                            {% if form.category.errors %}
+                                <div class="text-danger small">{{ form.category.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Urgency <span class="text-danger">*</span></label>
+                            {{ form.urgency }}
+                            {% if form.urgency.errors %}
+                                <div class="text-danger small">{{ form.urgency.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Description <span class="text-danger">*</span></label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                            <div class="text-danger small">{{ form.description.errors }}</div>
+                        {% endif %}
+                        <small class="form-text text-muted">Please provide as much detail as possible.</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Screenshot (optional)</label>
+                        {{ form.screenshot }}
+                        {% if form.screenshot.errors %}
+                            <div class="text-danger small">{{ form.screenshot.errors }}</div>
+                        {% endif %}
+                        <small class="form-text text-muted">Upload a screenshot or image related to the issue.</small>
+                    </div>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'employee_dashboard' %}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send"></i> Submit Ticket
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h6 class="mb-0"><i class="bi bi-info-circle"></i> Tips</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Be specific in your description</li>
+                    <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Include error messages if any</li>
+                    <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Attach screenshots when helpful</li>
+                    <li class="mb-0"><i class="bi bi-check-circle text-success"></i> Select appropriate urgency level</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
